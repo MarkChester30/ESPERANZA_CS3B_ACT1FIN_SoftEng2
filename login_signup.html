@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up & Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: auto;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+        .form {
+            display: none;
+            width: 100%;
+        }
+        .form.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+            color: #333;
+        }
+        button {
+            width: 90%;
+            padding: 10px;
+            background-color: #ccc;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #aaa;
+        }
+        .toggle-form {
+            margin-top: 10px;
+            color: #555;
+        }
+        .toggle-form a {
+            color: #333;
+            text-decoration: none;
+        }
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+        .welcome-message {
+            font-size: 1.2em;
+            color: #333;
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-wrapper">
+    <div class="form-container">
+        <div id="signup-form" class="form active">
+            <h2>Sign Up</h2>
+            <input type="text" id="signup-name" placeholder="Name" required>
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <button onclick="signUp()">Sign Up</button>
+            <div class="toggle-form">Already have an account? <a href="#" onclick="toggleForms()">Log In</a></div>
+        </div>
+        
+        <div id="login-form" class="form">
+            <h2>Log In</h2>
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button onclick="logIn()">Log In</button>
+            <div class="toggle-form">Don't have an account? <a href="#" onclick="toggleForms()">Sign Up</a></div>
+        </div>
+    </div>
+</div>
+
+<div class="welcome-message" id="welcome-message"></div>
+
+<script>
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    
+    function toggleForms() {
+        document.getElementById('signup-form').classList.toggle('active');
+        document.getElementById('login-form').classList.toggle('active');
+    }
+    
+    function signUp() {
+        const username = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim().toLowerCase();
+        const password = document.getElementById('signup-password').value.trim();
+
+        if (!username || !email || !password) {
+            alert('All fields are required!');
+            return;
+        }
+        if (!email.endsWith('@gmail.com')) {
+            alert('Email must be a Gmail address.');
+            return;
+        }
+        if (password.length <= 7) {
+            alert('Password must be 8 characters long.');
+            return;
+        }
+        if (users.some(user => user.email === email)) {
+            alert('Email is already registered.');
+            return;
+        }
+
+        users.push({ username, email, password });
+        localStorage.setItem('users', JSON.stringify(users));
+        alert('Sign Up Successful!');
+        toggleForms();
+        document.getElementById('signup-name').value = '';
+        document.getElementById('signup-email').value = '';
+        document.getElementById('signup-password').value = '';
+    }
+    
+    function logIn() {
+        const email = document.getElementById('login-email').value.trim().toLowerCase();
+        const password = document.getElementById('login-password').value.trim();
+
+        if (!email || !password) {
+            alert('All fields are required!');
+            return;
+        }
+
+        const user = users.find(user => user.email === email && user.password === password);
+        if (user) {
+            document.getElementById('welcome-message').innerText = `Welcome, ${user.username}!`;
+            document.getElementById('welcome-message').style.display = 'block';
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+        } else {
+            alert('Invalid email or password.');
+        }
+    }
+</script>
+
+</body>
+</html>
